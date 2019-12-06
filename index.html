@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="style.css" />
+
+    <title>Tesla CyberTruck</title>
+  </head>
+  <body>
+    <!-- audio with Javascript-->
+    <script>
+      function play() {
+        var audio = new Audio("cybertruck.mp3");
+        audio.play();
+      }
+    </script>
+
+    <button class="btn" onclick="play();">
+      Play Music
+    </button>
+
+    <!-- Three JS Loader -->
+    <script src="js/three.min.js"></script>
+    <!-- GLTF Loader page needed to renderer the 3D object -->
+    <script src="js/GLTFLoader.js"></script>
+
+    <!-- Orbit Control allow the camera to orbit around a target
+    
+        Major issues with orbit control. Won't work. 
+        TypeError:renderer??
+    -->
+    <script src="js/OrbitControls.js"></script>
+
+    <script>
+      //  create a scene for binding
+      var camera, scene, renderer;
+
+      // BASIC SET UP; set background and camera using the bind
+      function init() {
+        // FIRST - create scene
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color("#232323");
+
+        // SECOND - set camera using the bind
+        camera = new THREE.PerspectiveCamera(
+          40,
+          window.innerWidth / window.innerHeight,
+          1,
+          5000
+        );
+        camera.rotation.y = (45 / 180) * Math.PI;
+        camera.position.x = 950;
+        camera.position.y = 150;
+        camera.position.z = 1000;
+
+        /*
+            LIGHTENING 101 
+
+                Ambient Light floods entire scene with consistent lightening (color, intensity)
+
+                Point Light radiate out from a single point; (color, intensity, distance, decay)
+                Position Matters. Set(x, y, z)
+
+                Directional really powerful light source come from single direction; Sun light. 
+        
+        
+        */
+
+        // Ambient Light
+        hlight = new THREE.AmbientLight(0x404040, 1);
+        scene.add(hlight);
+
+        // Point Light
+        light = new THREE.PointLight(0xc4c4c4, 50, 5000, 1);
+        light.position.set(500, 1000, 1000);
+        scene.add(light);
+
+        light2 = new THREE.PointLight(0xc4c4c4, 10);
+        light2.position.set(500, 1000, 0);
+        scene.add(light2);
+
+        light3 = new THREE.PointLight(0xc4c4c4, 10);
+        light3.position.set(0, 100, -500);
+        scene.add(light3);
+
+        // light4 = new THREE.PointLight(0xc4c4c4, 10);
+        // light4.position.set(-500, 300, 0);
+        // scene.add(light4);
+
+        // Directional Light
+        directionalLight = new THREE.DirectionalLight(0xffffff, 20, 100);
+        directionalLight.position.set(-1000, 50, -100);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        // THIRD - set up the render
+        renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // NEW TESTING GROUND HERE
+
+        var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+        // END TESTING GROUND HERE
+
+        // LOADING THE MODEL
+        // use GLTF loader class
+        let loader = new THREE.GLTFLoader();
+        loader.load("scene.gltf", function(gltf) {
+          car = gltf.scene.children[0];
+          car.scale.set(2, 2, 2);
+
+          // add model to the scene
+          scene.add(gltf.scene);
+
+          render();
+
+          //  COMMENT OUT TESTING
+          //   renderer.render(scene, camera);
+        });
+      }
+
+      function render() {
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+      }
+
+      init();
+
+      // // LOADING THE MODEL
+      //         // use GLTF loader class
+      //         let loader = new THREE.GLTFLoader();
+      //         loader.load("scene.gltf", function(gltf) {
+      //           car = gltf.scene.children[0];
+      //           car.scale.set(0.5, 0.5, 0.5);
+
+      //           // add model to the scene
+      //           scene.add(gltf.scene);
+      //           // loop animate to update scene when rotate camera
+      //           animate();
+      //         });
+
+      //     // CREATE 360 DEGREES VIEWER
+      //     let controls = new THREE.OrbitControls(camera);
+      //     // add event listeniner to track control
+      //     controls.addEventListener("change", renderer);
+
+      //
+      //     function animate() {
+      //       renderer.render(scene, camera);
+      //       requestAnimationFrame(animate);
+      //     }
+
+      //     // call back function
+      //     init();
+      //   }
+    </script>
+  </body>
+</html>
